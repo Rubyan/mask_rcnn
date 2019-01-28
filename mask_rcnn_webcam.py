@@ -48,11 +48,10 @@ vs = cv2.VideoCapture(0)
 #if (!vs.isOpened())  // check if succeeded to connect to the camera
 #   CV_Assert("Cam open failed");
 
-# vs.set(cv2.CAP_PROP_FRAME_WIDTH,800);
-# vs.set(cv2.CAP_PROP_FRAME_HEIGHT,600);
-vs.set(cv2.CAP_PROP_FRAME_WIDTH,1024);
-vs.set(cv2.CAP_PROP_FRAME_HEIGHT,768);
-vs.set(cv2.CAP_PROP_FPS, 0.5)
+
+# vs.set(cv2.CAP_PROP_FRAME_WIDTH,1024);
+# vs.set(cv2.CAP_PROP_FRAME_HEIGHT,768);
+# vs.set(cv2.CAP_PROP_FPS, 0.5)
 
 writer = None
 
@@ -130,7 +129,7 @@ while True:
             # the instance segmentation on the frame
             text = "{}: {:.4f}".format(LABELS[classID], confidence)
             cv2.putText(frame, text, (startX, startY - 5),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.5, color=color, thickness=1)
 
     # show the detected cat faces
     cv2.imshow("mask_rcnn", frame)
