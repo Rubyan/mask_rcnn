@@ -4,7 +4,7 @@
 # import the necessary packages
 import numpy as np
 import argparse
-import imutils
+#import imutils
 import time
 import cv2
 import os
@@ -45,7 +45,7 @@ configPath = os.path.sep.join([args["mask_rcnn"],
 
 # load our Mask R-CNN trained on the COCO dataset (90 classes)
 # from disk
-print("[INFO] loading Mask R-CNN from disk...")
+logging.info("loading Mask R-CNN from disk...")
 net = cv2.dnn.readNetFromTensorflow(weightsPath, configPath)
 
 # initialize the video stream and pointer to output video file
@@ -63,8 +63,7 @@ vs.set(cv2.CAP_PROP_FPS, 0.5)
 
 writer = None
 
-logging.info(f"confidence treshold: {args['confidence']}")
-logging.info(f"draw y/n: {args['draw']}")
+logging.info("confidence treshold: " + str(args['confidence']))
 
 # loop over frames from the video file stream
 while True:
@@ -144,7 +143,7 @@ while True:
             cv2.putText(frame, text, (startX, startY - 5),
                 fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.5, color=color, thickness=1)
 
-            logging.info(f"Car confidence: {confidence}")
+            logging.info("Car confidence: " + str(confidence))
 
     # show the image
     if args['draw'] == 'y':
@@ -155,7 +154,7 @@ while True:
             break
 
 # release the file pointers
-print("[INFO] cleaning up...")
+logging.info("cleaning up...")
 
 # When everything done, release the capture
 vs.release()
