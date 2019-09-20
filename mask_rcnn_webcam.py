@@ -8,6 +8,12 @@ import imutils
 import time
 import cv2
 import os
+import logging
+
+# set the logging config
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"),
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -17,6 +23,8 @@ ap.add_argument("-c", "--confidence", type=float, default=0.5,
     help="minimum probability to filter weak detections")
 ap.add_argument("-t", "--threshold", type=float, default=0.3,
     help="minimum threshold for pixel-wise mask segmentation")
+ap.add_argument("-d", "--draw", default="y",
+    help="draw image on screen (y/n)")
 args = vars(ap.parse_args())
 
 # load the COCO class labels our Mask R-CNN was trained on
@@ -42,8 +50,8 @@ net = cv2.dnn.readNetFromTensorflow(weightsPath, configPath)
 
 # initialize the video stream and pointer to output video file
 # vs = cv2.VideoCapture(args["input"])
-#vs = cv2.VideoCapture("http://192.168.1.29:8081/")
-vs = cv2.VideoCapture(0)
+vs = cv2.VideoCapture("http://192.168.1.29:8081/")
+#vs = cv2.VideoCapture(0)
 
 #if (!vs.isOpened())  // check if succeeded to connect to the camera
 #   CV_Assert("Cam open failed");
@@ -51,11 +59,12 @@ vs = cv2.VideoCapture(0)
 
 # vs.set(cv2.CAP_PROP_FRAME_WIDTH,1024);
 # vs.set(cv2.CAP_PROP_FRAME_HEIGHT,768);
-# vs.set(cv2.CAP_PROP_FPS, 0.5)
+vs.set(cv2.CAP_PROP_FPS, 0.5)
 
 writer = None
 
-
+logging.info(f"confidence treshold: {args['confidence']}")
+logging.info(f"draw y/n: {args['draw']}")
 
 # loop over frames from the video file stream
 while True:
@@ -85,6 +94,10 @@ while True:
         # prediction
         classID = int(boxes[0, 0, i, 1])
         confidence = boxes[0, 0, i, 2]
+
+        # detect cars only
+        if classID not in [2]:
+            continue
 
         # filter out weak predictions by ensuring the detected
         # probability is greater than the minimum probability
@@ -131,13 +144,16 @@ while True:
             cv2.putText(frame, text, (startX, startY - 5),
                 fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.5, color=color, thickness=1)
 
-    # show the detected cat faces
-    cv2.imshow("mask_rcnn", frame)
+            logging.info(f"Car confidence: {confidence}")
 
-    # Display the resulting frame
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-        
+    # show the image
+    if args['draw'] == 'y':
+        cv2.imshow("mask_rcnn", frame)
+
+        # Display the resulting frame
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
 # release the file pointers
 print("[INFO] cleaning up...")
 
