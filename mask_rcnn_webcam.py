@@ -70,10 +70,14 @@ while True:
     # read the next frame from the file
     (grabbed, frame) = vs.read()
 
+    logging.info("trying to grab a frame")
     # if the frame was not grabbed, then we have reached the end
     # of the stream
     if not grabbed:
+        logging.error("could not grab frame")
         break
+
+    logging.info("a frame was grabbed")
 
     # construct a blob from the input frame and then perform a
     # forward pass of the Mask R-CNN, giving us (1) the bounding box
